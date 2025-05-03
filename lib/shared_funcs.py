@@ -28,16 +28,12 @@ def format_date(date_str):
 def format_match_info(df, team_info):
     home_prefix = team_info['home_prefix']
     away_prefix = team_info['away_prefix']
-    df['formatted_date'] = df['kick_off_at'].apply(format_date)
-    match_date = format_date(df['kick_off_at'].iloc[0])
+    df['formatted_date'] = df['match_date'].apply(format_date)
+    match_date = format_date(df['match_date'].iloc[0])
     match_comp = str(df['competition_name'].iloc[0])
-    match_season = str(df['season'].iloc[0])
-    if 'home_goals' in df.columns and 'away_goals' in df.columns:
-        home_goals = int(df['home_goals'].sum())
-        away_goals = int(df['away_goals'].sum())
-    elif 'home_cumulative_score' in df.columns and 'away_cumulative_score' in df.columns:
-        home_goals = int(df['home_cumulative_score'].max())
-        away_goals = int(df['away_cumulative_score'].max())
+    match_season = str(df['season_name'].iloc[0])
+    home_goals = int(df[(df['outcome'] == 'goal') & (df['team_name'] == df['match_home_team_name'])].shape[0])
+    away_goals = int(df[(df['outcome'] == 'goal') & (df['team_name'] == df['match_away_team_name'])].shape[0])
     match_score = f"{home_goals} - {away_goals}"
     comp_prefix = match_comp[:3].upper()
     folder_name = f"{home_prefix}{away_prefix}{comp_prefix}"

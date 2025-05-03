@@ -18,6 +18,9 @@ def setup_visualisation_params(theme='dark'):
         bg = '#f8f8f9'
         text_color = '#1d1c1c'
         line_color = '#a4a4a4'
+        pitch_line_color = '#1d1c1c'
+        pass_color = '#ffc53c'
+        carry_color = '#5aace2'
     else:
         raise ValueError("Invalid theme specified. Choose 'dark' or 'light'.")
 
