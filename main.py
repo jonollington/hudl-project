@@ -1,17 +1,18 @@
 from fetch.shot_events import get_shot_events
-from fetch.pass_events import get_pass_events
+from fetch.match_events import get_match_data
 
 from lib.shared_viz_funcs import get_team_colors, setup_visualisation_params
-from lib.shared_funcs import extract_team_info, format_match_info, save_plot, preprocess_data
+from lib.shared_funcs import extract_team_info, format_match_info, save_plot, preprocess_data, get_team_data
 
 
 
 from visualise.shot_map.shot_map import create as create_shot_map
+from visualise.territory.territory import create as create_territory
 
 
 # Fetch data
 shot_events = get_shot_events(1358854)
-pass_events = get_pass_events(1358854)
+pass_events = get_match_data(1358854)
 
 
 ##############################################################
@@ -47,10 +48,14 @@ team_colors = get_team_colors(team_info, theme='trad')
 visualisation_params = setup_visualisation_params(theme='dark')
 
 # Apply transformations for territory
-df1 = get_team_data(df, team_info)
-df2 = get_team_data(df, team_info)
-df2.loc[:, 'x'] = 105 - df2['x']  # Adjusting the x-coordinates for away team
-df2.loc[:, 'y'] = 68 - df2['y']  # Adjusting the y-coordinates for away team
+home_team = team_info['home_team']
+away_team = team_info['away_team']
+
+df1 = df[df['team_name'] == home_team]
+df2 = df[df['team_name'] == away_team]
+
+df2.loc[:, 'start_x'] = 105 - df2['start_x']  # Adjusting the x-coordinates for away team
+df2.loc[:, 'start_y'] = 68 - df2['start_y']  # Adjusting the y-coordinates for away team
 
 # Create and save
 fig, ax = create_territory(df1, df2, team_info, team_colors, visualisation_params, match_info)

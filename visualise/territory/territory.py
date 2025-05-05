@@ -30,8 +30,8 @@ def create(df1, df2, team_info, team_colors, visualisation_params, match_info):
     ax.set_ylim(-5, 68.5)
     ax.set_xlim(-3, 108)
 
-    bin_statistic1 = pitch.bin_statistic(df1.x, df1.y, bins=(6, 5), statistic='count', normalize=False)
-    bin_statistic2 = pitch.bin_statistic(df2.x, df2.y, bins=(6, 5), statistic='count', normalize=False)
+    bin_statistic1 = pitch.bin_statistic(df1.start_x, df1.start_y, bins=(6, 5), statistic='count', normalize=False)
+    bin_statistic2 = pitch.bin_statistic(df2.start_x, df2.start_y, bins=(6, 5), statistic='count', normalize=False)
 
     create_heatmap(ax, bin_statistic1, bin_statistic2, cmap, pitch)
     plot_texts(ax, home_team, away_team, home_color, away_color, line_color, match_comp, match_date, match_score, bg)

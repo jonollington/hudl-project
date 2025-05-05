@@ -59,34 +59,14 @@ def get_team_colors(team_info, theme='dark'):
     away_team = team_info['away_team']
     # Define theme colors
     if theme == 'dark':
-        if home_team == 'Arsenal':
-            home_color = '#be0a24'
-            away_color = '#959595'
-        elif away_team == 'Arsenal':
-            home_color = '#959595'
-            away_color = '#be0a24'
-        else:
-            home_color = away_color = '#000000'  # Default color for dark theme if neither team is Arsenal
+        home_color = '#be0a24'
+        away_color = '#959595'
     elif theme == 'light':
-        if home_team == 'Arsenal':
-            home_color = '#f2096f'
-            away_color = '#3089f9'
-        elif away_team == 'Arsenal':
-            away_color = '#f2096f'
-            home_color = '#3089f9'
-        else:
-            home_color = away_color = '#FFFFFF'  # Default color for light theme if neither team is Arsenal
+        home_color = '#f2096f'
+        away_color = '#3089f9'
     elif theme == 'trad':
-        if home_team == 'Arsenal':
-            home_color = '#ff4b44'
-            away_color = '#00a0de'
-        elif away_team == 'Arsenal':
-            home_color = '#00a0de'
-            away_color = '#ff4b44'
-        else:
-            home_color = away_color = '#000000'  # Default color for trad theme if neither team is Arsenal
-    else:
-        home_color = away_color = None  # Default case if theme is not 'dark' or 'light'
+        home_color = '#ff4b44'
+        away_color = '#00a0de'
 
     team_colors = {
     "home_color": home_color,

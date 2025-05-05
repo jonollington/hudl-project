@@ -74,26 +74,22 @@ def preprocess_data(df, pitch_length=105, pitch_width=68):
     return df
 
 
+def get_team_data(df, team_info, return_range=False):
 
-
-# def get_team_data(df, team_info, return_range=False):
-#     df['qualifiers'] = df['qualifiers'].astype(str)
-
-#     if return_range:
-#         start_min = df.expanded_minute.min()
-#         end_min = df.expanded_minute.max()
-#         return start_min, end_min
+    if return_range:
+        start_min = df.timestamp.min()
+        end_min = df.timestamp.max()
+        return start_min, end_min
     
-#     # Use team_info dictionary to access home and away teams
-#     home_team = team_info['home_team']
-#     away_team = team_info['away_team']
+    # Use team_info dictionary to access home and away teams
+    home_team = team_info['home_team']
+    away_team = team_info['away_team']
 
-#     # Filter the DataFrame for the specified team
-#     team_data = df[(df['name'].isin([home_team, away_team])) & 
-#                     (df['is_touch'] == True) & 
-#                     (~df['qualifiers'].str.contains('CornerTaken|Freekick|ThrowIn'))]
+    # Filter the DataFrame for the specified team
+    team_data = df[(df['team_name'].isin([home_team, away_team]))]
 
-#     return team_data
+    return team_data
+
 
 # def preprocess_xg_data(df):
 #     shot_df = df.copy()
