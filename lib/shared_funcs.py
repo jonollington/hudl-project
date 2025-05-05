@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from mplsoccer import Standardizer
 
 def extract_team_info(df, save_suffix):
     home_team = df['match_home_team_name'].dropna().iloc[0]
@@ -64,3 +65,49 @@ def save_plot(fig, match_info, team_info, visualisation_params):
     fig.savefig(f"{output_dir}/{save_string}.jpeg", bbox_inches='tight', facecolor=bg)
 
     print(f"Plot saved to {output_dir}/{save_string}.jpeg")
+
+
+def preprocess_data(df, pitch_length=105, pitch_width=68):
+    statsbomb_to_uefa = Standardizer(pitch_from='statsbomb', pitch_to='uefa', length_to=pitch_length, width_to=pitch_width)
+    df.start_x, df.start_y = statsbomb_to_uefa.transform(df.start_x, df.start_y)
+    df.end_x, df.end_y = statsbomb_to_uefa.transform(df.end_x, df.end_y)
+    return df
+
+
+
+
+# def get_team_data(df, team_info, return_range=False):
+#     df['qualifiers'] = df['qualifiers'].astype(str)
+
+#     if return_range:
+#         start_min = df.expanded_minute.min()
+#         end_min = df.expanded_minute.max()
+#         return start_min, end_min
+    
+#     # Use team_info dictionary to access home and away teams
+#     home_team = team_info['home_team']
+#     away_team = team_info['away_team']
+
+#     # Filter the DataFrame for the specified team
+#     team_data = df[(df['name'].isin([home_team, away_team])) & 
+#                     (df['is_touch'] == True) & 
+#                     (~df['qualifiers'].str.contains('CornerTaken|Freekick|ThrowIn'))]
+
+#     return team_data
+
+# def preprocess_xg_data(df):
+#     shot_df = df.copy()
+#     shot_df = shot_df[(shot_df['type_display_name'] == 'MissedShots') | (shot_df['type_display_name'] == 'ShotOnPost') | (shot_df['type_display_name'] == 'SavedShot') | (shot_df['type_display_name'] == 'Goal')]
+#     shot_df = shot_df[['expanded_minute','second','period_display_value','player_name','event_type','team_name','home_team','away_team','expected_goals','home_cumulative_xg','away_cumulative_xg','home_cumulative_score','away_cumulative_score']]
+#     shot_df['max_xg'] = np.maximum(shot_df['home_cumulative_xg'], shot_df['away_cumulative_xg'])
+#     shot_df['time'] = shot_df['expanded_minute'] + shot_df['second'] / 60
+#     highest_value = shot_df['max_xg'].max()
+#     return shot_df, highest_value
+
+# def preprocess_pass_data(pass_df):
+#     pass_df = cumulative_match_mins(pass_df)
+#     pass_df = insert_ball_carries(pass_df, min_carry_length=3, max_carry_length=60, min_carry_duration=1, max_carry_duration=10)
+#     pass_df['index'] = range(1, len(pass_df) + 1)
+#     pass_df = pass_df[['index'] + [col for col in pass_df.columns if col != 'index']]
+#     return pass_df
+
