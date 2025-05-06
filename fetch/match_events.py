@@ -8,7 +8,7 @@ def get_match_data(match_id: int) -> pd.DataFrame:
         "Authorization": f"Bearer {access_token}"
     }
 
-    # Query: Shots
+    # Query: Events
     query_events = f"""
     {{
       live_match_event(
@@ -18,6 +18,7 @@ def get_match_data(match_id: int) -> pd.DataFrame:
         outcome
         player_id
         team_id
+        position
         start_x
         start_y
         end_x
@@ -26,19 +27,25 @@ def get_match_data(match_id: int) -> pd.DataFrame:
         second
         duration
         timestamp
+        aerial_won
+        type
       }}
     }}
     """
 
-
-    # Query: Player info
+    # Query: Player info (extended)
     query_players = f"""
     {{
       live_lineup(
         where: {{ match_id: {{ _eq: {match_id} }} }}
       ) {{
+        lineup_jersey
+        match_id
         player_id
+        player_lineup_selection_type
         player_name
+        player_preferred_foot
+        team_id
         team_name
       }}
     }}
@@ -106,3 +113,4 @@ def get_match_data(match_id: int) -> pd.DataFrame:
         match_events[col] = df_competition.at[0, col]
 
     return match_events
+

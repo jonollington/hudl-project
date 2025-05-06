@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.font_manager as fm
+
 import matplotlib.patheffects as path_effects
 
 def is_font_available(font_name):

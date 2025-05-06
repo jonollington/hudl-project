@@ -1,124 +1,116 @@
+# Initialise the pitch
+pitch = VerticalPitch(pitch_type='uefa', pitch_color=bg, linewidth=1, corner_arcs=True,
+                      line_zorder=2, line_color=pitch_line_color, goal_type='box')
+fig, ax = pitch.draw(figsize=(16, 9))
+
+# ax.set_xlim(-0.5, 105.5)
+ax.set_ylim(-19, 110)
+
+# Analyse defensive actions
+average_locs, grouped_true_tackles_interceptions, grouped_true_interceptions, grouped_aerial_duels, grouped_recoveries = analyse_defensive_actions(
+    average_locs_and_count_df,
+    defensive_actions_df,
+    team_name='Arsenal'
+)
+
+average_locs_and_count_df = average_locs_and_count_df[average_locs_and_count_df['team_name'] == 'Arsenal']
+defensive_actions_team_df = defensive_actions_df[defensive_actions_df["team_name"] == 'Arsenal']
+
+plot_defensive_action_lines(ax, average_locs_and_count_df)
+# plotting the heatmap of the team defensive actions
+color = np.array(to_rgba(away_color))
+cmap = LinearSegmentedColormap.from_list("", [bg, away_color], N=500)
+kde = pitch.kdeplot(defensive_actions_team_df.x, defensive_actions_team_df.y, ax=ax, fill=True, levels=5000, thresh=0.02, cut=4, cmap=cmap)
+# da_scatter = pitch.scatter(defensive_actions_team_df.x, defensive_actions_team_df.y, s=10, marker='x', color='w', alpha=0.2, ax=ax)
 
 
+average_locs_and_count_df.loc[average_locs_and_count_df['player_name'] == 'Riccardo Calafiori', 'is_first_eleven'] = False
+average_locs_and_count_df.loc[average_locs_and_count_df['player_name'] == 'Ben White', 'is_first_eleven'] = True
+average_locs_and_count_df.loc[average_locs_and_count_df['player_name'] == 'Leandro Trossard', 'is_first_eleven'] = True
 
-def get_defensive_action_df(df):
+# Scatter plot for defensive actions
+for index, row in average_locs_and_count_df.iterrows():
+    marker_shape = 'o' if row['is_first_eleven'] else 's'
+    da_nodes = pitch.scatter(
+        row['x'], row['y'], 
+        s=row['marker_size'] + 100, 
+        marker=marker_shape, 
+        color=bg, 
+        edgecolor=line_color, 
+        linewidth=2, 
+        alpha=0.8, 
+        zorder=4 if row['is_first_eleven'] else 3, 
+        ax=ax
+    )
 
-    df['qualifiers'] = df['qualifiers'].astype(str)
-    # filter only defensive actions
-    defensive_actions_ids = df.index[(df['type_display_name'] == 'Aerial') & (df['qualifiers'].str.contains('Defensive')) |
-                                     (df['type_display_name'] == 'BallRecovery') |
-                                     (df['type_display_name'] == 'BlockedPass') |
-                                     (df['type_display_name'] == 'Challenge') |
-                                     (df['type_display_name'] == 'Clearance') |
-                                     (df['type_display_name'] == 'Error') |
-                                     (df['type_display_name'] == 'Foul') |
-                                     (df['type_display_name'] == 'Interception') |
-                                     (df['type_display_name'] == 'Tackle')]
-    df_defensive_actions = df.loc[defensive_actions_ids, ["index", "x", "y", "team_name", "player_id", "type_display_name", "outcome_type_display_name"]]
+    # Annotate player initials
+    player_initials = row["shirt_no"]
+    pitch.annotate(
+        player_initials, 
+        xy=(row.x, row.y), 
+        c=line_color, 
+        ha='center', 
+        va='center', 
+        size=14, 
+        zorder=5, 
+        ax=ax, 
+        weight='bold',
+        path_effects=[path_effects.withStroke(linewidth=5, foreground=bg)]
+    )
 
-    return df_defensive_actions
+# Create an additional axis for defensive stats
+ax1 = fig.add_axes((0.7, 0.06, 0.38, 0.815))
+ax1.axis('off')
 
-defensive_actions_df = get_defensive_action_df(df)
-players_df = df[['player_id', 'name', 'shirt_no', 'position', 'is_first_eleven']]
+# Plot defensive stats
+plot_defensive_stats(ax1, grouped_true_tackles_interceptions, grouped_true_interceptions, grouped_aerial_duels, grouped_recoveries, folder_path, line_color, text_color, bodyfont, bg)
 
-def get_da_count_df(defensive_actions_df, players_df, team_info):
+# Set title for the shot map
+ax.set_title("defensive block".upper(), size=40, weight='black', family=titlefont,
+             y=1.05, style='italic', c='w')
+ax.text(0.5, 1.02, 'Premier League • '+match_date+' • '+home_team+' '+match_score+' '+away_team, size=16, ha='center', va='center', c=line_color,transform=ax.transAxes)
+ax.text(67,104, "circle: starter\nsquare: sub", color='gray', size=11, ha='left', va='top',
+          path_effects=[path_effects.withStroke(linewidth=6, foreground=bg)]
+        )
 
-    home_team = team_info['home_team']
-    away_team = team_info['away_team']
+# Set figure background color
+fig.patch.set_facecolor(bg)
+ax.set_facecolor(bg)
 
-    team_names = [home_team, away_team]
-    # Filter defensive actions for the teams in the list
-    defensive_actions_df = defensive_actions_df[defensive_actions_df["team_name"].isin(team_names)]
-    # add column with first eleven players only
-    defensive_actions_df = defensive_actions_df.merge(players_df[["player_id", "is_first_eleven"]], on='player_id', how='left')
-    # calculate mean positions for players
-    average_locs_and_count_df = (defensive_actions_df.groupby('player_id').agg({'x': ['median'], 'y': ['median', 'count']}))
-    average_locs_and_count_df.columns = ['x', 'y', 'count']
-    average_locs_and_count_df = average_locs_and_count_df.reset_index()
-    average_locs_and_count_df = average_locs_and_count_df.merge(players_df[['player_id', 'name', 'shirt_no', 'position', 'is_first_eleven']], on='player_id', how='left')
-    average_locs_and_count_df = average_locs_and_count_df.set_index('player_id')
-
-    return  average_locs_and_count_df
+fig.text(1.09, 0.03, '@ j o n o l l i n g t o n',
+           ha='right', fontsize=15, color=line_color)
 
 
-defensive_home_average_locs_and_count_df = get_da_count_df(home_team, defensive_actions_df, players_df)
-defensive_away_average_locs_and_count_df = get_da_count_df(away_team, defensive_actions_df, players_df)
-defensive_home_average_locs_and_count_df = defensive_home_average_locs_and_count_df[defensive_home_average_locs_and_count_df['position'] != 'GK']
-defensive_away_average_locs_and_count_df = defensive_away_average_locs_and_count_df[defensive_away_average_locs_and_count_df['position'] != 'GK']
+ax2 = fig.add_axes([1,0.91,0.1,0.1]) # badge
+ax2.axis("off")
+img = Image.open('../../logo/colour/cannonSilver.png')
+ax2.imshow(img)
 
-def defensive_block(ax, average_locs_and_count_df, team_name, col):
-    defensive_actions_team_df = defensive_actions_df[defensive_actions_df["team_name"] == team_name]
-    pitch = Pitch(pitch_type='uefa', pitch_color=bg, line_color=line_color, linewidth=2, line_zorder=2, corner_arcs=True)
-    pitch.draw(ax=ax)
-    ax.set_facecolor(bg)
-    ax.set_xlim(-0.5, 105.5)
-    ax.set_ylim(-0.5, 68.5)
+cSize = [50,150,300,0]
+cSizeS = [10000 * i for i in cSize]
+cx = [0,0.027,0.06,0.15]
+cy = [0,0,0,0]
 
-    # using variable marker size for each player according to their defensive engagements
-    MAX_MARKER_SIZE = 3500
-    average_locs_and_count_df['marker_size'] = (average_locs_and_count_df['count']/ average_locs_and_count_df['count'].max() * MAX_MARKER_SIZE)
-    # plotting the heatmap of the team defensive actions
-    color = np.array(to_rgba(col))
-    flamingo_cmap = LinearSegmentedColormap.from_list("Flamingo - 100 colors", [bg, col], N=500)
-    kde = pitch.kdeplot(defensive_actions_team_df.x, defensive_actions_team_df.y, ax=ax, fill=True, levels=5000, thresh=0.02, cut=4, cmap=flamingo_cmap)
+#arrow
+arrow="Simple,tail_width=0.05,head_width=0.8,head_length=0.8"
+ax2 = fig.add_axes([0.45,0.04,0.25,0.05])
+ax2.axis("off")
+ax2.annotate('', (0.4,0),(0,0), zorder=10, arrowprops=dict(arrowstyle=arrow, color=line_color,alpha=1))
 
-    # using different node marker for starting and substitute players
-    average_locs_and_count_df = average_locs_and_count_df.reset_index(drop=True)
-    for index, row in average_locs_and_count_df.iterrows():
-        if row['is_first_eleven'] == True:
-            da_nodes = pitch.scatter(row['x'], row['y'], s=row['marker_size']+100, marker='o', color=bg, edgecolor=line_color, linewidth=1, 
-                                 alpha=1, zorder=3, ax=ax)
-        else:
-            da_nodes = pitch.scatter(row['x'], row['y'], s=row['marker_size']+100, marker='s', color=bg, edgecolor=line_color, linewidth=1, 
-                                     alpha=1, zorder=3, ax=ax)
-    # plotting very tiny scatterings for the defensive actions
-    da_scatter = pitch.scatter(defensive_actions_team_df.x, defensive_actions_team_df.y, s=10, marker='x', color='yellow', alpha=0.2, ax=ax)
 
-    # Plotting the shirt no. of each player
-    # for index, row in average_locs_and_count_df.iterrows():
-    #     player_initials = row["shirt_no"]
-    #     pitch.annotate(player_initials, xy=(row.x, row.y), c=line_color, ha='center', va='center', size=(14), ax=ax)
+fig.text(0.5,0.055, "Defensive Actions", color=text_color, fontfamily=titlefont, size=10, va='center',ha='center')
+ax3 = fig.add_axes([0.465,0.06,0.15,0.05])
+ax3.axis("off")
+ax3.scatter(cx,cy,s=cSize, color=bg,ec=text_color,lw=1,alpha=1)
 
-    # Plotting a vertical line to show the median vertical position of all defensive actions, which is called Defensive Actions Height
-    dah = round(average_locs_and_count_df['x'].mean(), 2)
-    dah_show = round((dah*1.05), 2)
-    ax.axvline(x=dah, color='gray', linestyle='--', alpha=0.75, linewidth=2)
+# Single colorbar with increased height (taller)
+a1 = plt.axes([0.455, -0.03, 0.08, 0.4])  # Increased the height to make it taller
+cbar = fig.colorbar(cm.ScalarMappable(norm=None, cmap=cmap), ax=a1, location='bottom')
+cbar.set_ticks([])
+cbar.outline.set_visible(False)
+a1.axis("off")
+a1.set_facecolor(bg)
 
-    # Defense line Defensive Actions Height
-    center_backs_height = average_locs_and_count_df[average_locs_and_count_df['position']=='DC']
-    def_line_h = round(center_backs_height['x'].median(), 2)
-    ax.axvline(x=def_line_h, color='gray', linestyle='dotted', alpha=0.5, linewidth=2)
-    # Forward line Defensive Actions Height
-    Forwards_height = average_locs_and_count_df[average_locs_and_count_df['is_first_eleven']==1]
-    Forwards_height = Forwards_height.sort_values(by='x', ascending=False)
-    Forwards_height = Forwards_height.head(2)
-    fwd_line_h = round(Forwards_height['x'].mean(), 2)
-    ax.axvline(x=fwd_line_h, color='gray', linestyle='dotted', alpha=0.5, linewidth=2)
 
-    # Getting the compactness value 
-    compactness = round((1 - ((fwd_line_h - def_line_h) / 105)) * 100, 2)
-
-    # Headings and other texts
-    if team_name == away_team:
-        # inverting the axis for away team
-        ax.invert_xaxis()
-        ax.invert_yaxis()
-        ax.text(dah-1, 73, f"{dah_show}m", fontsize=15, color=line_color, ha='left', va='center')
-    else:
-        ax.text(dah-1, -5, f"{dah_show}m", fontsize=15, color=line_color, ha='right', va='center')
-
-    # Headlines and other texts
-    if team_name == home_team:
-        ax.text(105, -5, f'Compact:{compactness}%', fontsize=15, color=line_color, ha='right', va='center')
-        ax.text(2,66, "circle = starter\nbox = sub", color='gray', size=12, ha='left', va='top')
-        ax.set_title(f"{home_team}\nDefensive Block", color=line_color, fontsize=25, fontweight='bold')
-    else:
-        ax.text(105, 73, f'Compact:{compactness}%', fontsize=15, color=line_color, ha='left', va='center')
-        ax.text(2,2, "circle = starter\nbox = sub", color='gray', size=12, ha='right', va='top')
-        ax.set_title(f"{away_team}\nDefensive Block", color=line_color, fontsize=25, fontweight='bold')
-
-    return {
-        'Team_Name': team_name,
-        'Average_Defensive_Action_Height': dah,
-        'Forward_Line_Pressing_Height': fwd_line_h
-    }
+# Save the figure
+plt.savefig("../../output-scripts/output_pngs/defensive_actions.jpeg", bbox_inches='tight', format='jpeg')
