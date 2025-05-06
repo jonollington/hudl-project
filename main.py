@@ -10,11 +10,12 @@ from lib.shared_funcs import extract_team_info, format_match_info, save_plot, pr
 from visualise.shot_map.shot_map import create as create_shot_map
 from visualise.territory.territory import create as create_territory
 from visualise.pass_end_zones.pass_end_zones import create as create_pass_end_zones
+from visualise.chance_creation_zones.chance_creation_zones import create as create_chance_creation_zones
 
 
 # Fetch data
 shot_events = get_shot_events(1358854)
-# match_events = get_match_data(1358854)
+pass_events = get_match_data(1358854)
 match_events = get_match_data(1358854)
 
 
@@ -43,7 +44,7 @@ save_plot(fig, match_info, team_info, visualisation_params)
 
 
 ## Territory Plot
-df = preprocess_data(match_events)
+df = preprocess_data(pass_events)
 team_info = extract_team_info(df, "territory")
 match_info = format_match_info(df, team_info)
 team_colors = get_team_colors(team_info, theme='trad')
@@ -65,7 +66,7 @@ save_plot(fig, match_info, team_info, visualisation_params)
 
 
 ## Pass End Zone Plot
-team_info = extract_team_info(match_events, 'pass_end_zone')
+team_info = extract_team_info(match_events, 'pass_end_zones')
 match_info = format_match_info(match_events, team_info)
 visualisation_params = setup_visualisation_params(theme='light')
 team_colors = get_team_colors(team_info, theme='light')
@@ -77,6 +78,23 @@ away_team = team_info['away_team']
 # Create and save
 fig, axs = create_pass_end_zones(match_events, team_info, visualisation_params,  team_colors, match_info)
 save_plot(fig, match_info, team_info, visualisation_params)
+
+
+## Chance Creation Zone Plot
+team_info = extract_team_info(match_events, 'chance_creation_zones')
+match_info = format_match_info(match_events, team_info)
+visualisation_params = setup_visualisation_params(theme='light')
+team_colors = get_team_colors(team_info, theme='light')
+
+home_team = team_info['home_team']
+away_team = team_info['away_team']
+
+# Create and save
+fig, axs, stats_df = create_chance_creation_zones(match_events, team_info, visualisation_params, team_colors, match_info)
+save_plot(fig, match_info, team_info, visualisation_params)
+
+
+
 
 
 # ## Defensive Actions Plot

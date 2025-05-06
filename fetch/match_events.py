@@ -29,6 +29,7 @@ def get_match_data(match_id: int) -> pd.DataFrame:
         timestamp
         aerial_won
         type
+        key_pass
       }}
     }}
     """
