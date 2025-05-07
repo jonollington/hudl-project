@@ -16,7 +16,7 @@ def create(team_shot_events, team_info, team_colors, visualisation_params, match
     bodyfont = visualisation_params["bodyfont"]
     text_color = visualisation_params["text_color"]
     line_color = visualisation_params["pitch_line_color"]
-    # folder_path = visualisation_params["folder_path"]
+    folder_path = visualisation_params["folder_path"]
 
     home_team = team_info["home_team"]
     away_team = team_info["away_team"]
@@ -45,9 +45,9 @@ def create(team_shot_events, team_info, team_colors, visualisation_params, match
     positiondict1 = {'line1': [[0.9, .452], [1.07, .452], [1.24, .452]]}
     positiondict2 = {'line2': [[0.9, .264], [1.07, .264], [1.24, .264]]}
 
-    # plot_top_players(team_shot_events, team_shot_events, positiondict, 'line', 'total_goals', folder_path, line_color, text_color, bodyfont, ascending=True)
-    # plot_top_players(team_shot_events, team_shot_events, positiondict1, 'line1', 'total_shots', folder_path, line_color, text_color, bodyfont)
-    # plot_top_players(team_shot_events, team_shot_events, positiondict2, 'line2', 'total_xg', folder_path, line_color, text_color, bodyfont)
+    plot_top_players(team_shot_events, team_shot_events, positiondict, 'line', 'total_goals', folder_path, line_color, text_color, bodyfont, ascending=True)
+    plot_top_players(team_shot_events, team_shot_events, positiondict1, 'line1', 'total_shots', folder_path, line_color, text_color, bodyfont)
+    plot_top_players(team_shot_events, team_shot_events, positiondict2, 'line2', 'total_xg', folder_path, line_color, text_color, bodyfont)
 
     fig.set_facecolor(bg)
 

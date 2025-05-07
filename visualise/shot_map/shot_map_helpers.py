@@ -95,8 +95,8 @@ def add_metric_labels(ax1, text_color, line_color):
     for y in [9.3, 6.3, 3.3, 0.3]:
         ax1.plot([0.2, 3.2], [y, y], lw='0.5', c=line_color, ls='dotted')
 
-def plot_top_players(df, xg_df, positiondict, metric, key, folder_path, line_color, text_color, bodyfont, ascending=False):
-    players_df = xg_df[xg_df[key] > 0].sort_values(by=key, ascending=ascending)
+def plot_top_players(df, positiondict, metric, key, folder_path, line_color, text_color, bodyfont, ascending=False):
+    players_df = df[df[key] > 0].sort_values(by=key, ascending=ascending)
     positions = positiondict[metric]
     for i in range(min(len(players_df), len(positions))):
         pos = positions[i]

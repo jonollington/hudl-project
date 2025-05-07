@@ -40,55 +40,55 @@ team_shot_events = shot_events[shot_events['team_name'] == selected_team]
 
 # Create and save
 fig, ax = create_shot_map(shot_events, team_info, team_colors, visualisation_params, match_info)
-save_plot(fig, match_info, team_info, visualisation_params)
+# save_plot(fig, match_info, team_info, visualisation_params)
 
 
-## Territory Plot
-df = preprocess_data(pass_events)
-team_info = extract_team_info(df, "territory")
-match_info = format_match_info(df, team_info)
-team_colors = get_team_colors(team_info, theme='trad')
-visualisation_params = setup_visualisation_params(theme='dark')
+# ## Territory Plot
+# df = preprocess_data(pass_events)
+# team_info = extract_team_info(df, "territory")
+# match_info = format_match_info(df, team_info)
+# team_colors = get_team_colors(team_info, theme='trad')
+# visualisation_params = setup_visualisation_params(theme='dark')
 
-# Apply transformations for territory
-home_team = team_info['home_team']
-away_team = team_info['away_team']
+# # Apply transformations for territory
+# home_team = team_info['home_team']
+# away_team = team_info['away_team']
 
-df1 = df[df['team_name'] == home_team]
-df2 = df[df['team_name'] == away_team]
+# df1 = df[df['team_name'] == home_team]
+# df2 = df[df['team_name'] == away_team]
 
-df2.loc[:, 'start_x'] = 105 - df2['start_x']  # Adjusting the x-coordinates for away team
-df2.loc[:, 'start_y'] = 68 - df2['start_y']  # Adjusting the y-coordinates for away team
+# df2.loc[:, 'start_x'] = 105 - df2['start_x']  # Adjusting the x-coordinates for away team
+# df2.loc[:, 'start_y'] = 68 - df2['start_y']  # Adjusting the y-coordinates for away team
 
-# Create and save
-fig, ax = create_territory(df1, df2, team_info, team_colors, visualisation_params, match_info)
-save_plot(fig, match_info, team_info, visualisation_params)
-
-
-## Pass End Zone Plot
-team_info = extract_team_info(match_events, 'pass_end_zones')
-match_info = format_match_info(match_events, team_info)
-visualisation_params = setup_visualisation_params(theme='light')
-team_colors = get_team_colors(team_info, theme='light')
-
-home_team = team_info['home_team']
-away_team = team_info['away_team']
+# # Create and save
+# fig, ax = create_territory(df1, df2, team_info, team_colors, visualisation_params, match_info)
+# save_plot(fig, match_info, team_info, visualisation_params)
 
 
-# Create and save
-fig, axs = create_pass_end_zones(match_events, team_info, visualisation_params,  team_colors, match_info)
-save_plot(fig, match_info, team_info, visualisation_params)
+# ## Pass End Zone Plot
+# team_info = extract_team_info(match_events, 'pass_end_zones')
+# match_info = format_match_info(match_events, team_info)
+# visualisation_params = setup_visualisation_params(theme='light')
+# team_colors = get_team_colors(team_info, theme='light')
+
+# home_team = team_info['home_team']
+# away_team = team_info['away_team']
 
 
-## Chance Creation Zone Plot
-team_info = extract_team_info(match_events, 'chance_creation_zones')
-match_info = format_match_info(match_events, team_info)
-visualisation_params = setup_visualisation_params(theme='light')
-team_colors = get_team_colors(team_info, theme='light')
+# # Create and save
+# fig, axs = create_pass_end_zones(match_events, team_info, visualisation_params,  team_colors, match_info)
+# save_plot(fig, match_info, team_info, visualisation_params)
 
-home_team = team_info['home_team']
-away_team = team_info['away_team']
 
-# Create and save
-fig, axs, stats_df = create_chance_creation_zones(match_events, team_info, visualisation_params, team_colors, match_info)
-save_plot(fig, match_info, team_info, visualisation_params)
+# ## Chance Creation Zone Plot
+# team_info = extract_team_info(match_events, 'chance_creation_zones')
+# match_info = format_match_info(match_events, team_info)
+# visualisation_params = setup_visualisation_params(theme='light')
+# team_colors = get_team_colors(team_info, theme='light')
+
+# home_team = team_info['home_team']
+# away_team = team_info['away_team']
+
+# # Create and save
+# fig, axs, stats_df = create_chance_creation_zones(match_events, team_info, visualisation_params, team_colors, match_info)
+# save_plot(fig, match_info, team_info, visualisation_params)

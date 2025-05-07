@@ -39,6 +39,8 @@ def setup_visualisation_params(theme='dark'):
     matplotlib.rcParams['font.family'] = bodyfont
     matplotlib.rcParams['figure.dpi'] = 550
 
+    folder_path = '../../players/'
+
     # Return all parameters as a dictionary
     visualisation_params = {
         "bg": bg,
@@ -49,7 +51,8 @@ def setup_visualisation_params(theme='dark'):
         "text_color": text_color,
         "titlefont": titlefont,
         "bodyfont": bodyfont,
-        "figure_dpi": 550
+        "figure_dpi": 550,
+        "folder_path": folder_path
     }
 
     return visualisation_params
