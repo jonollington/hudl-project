@@ -92,14 +92,3 @@ away_team = team_info['away_team']
 # Create and save
 fig, axs, stats_df = create_chance_creation_zones(match_events, team_info, visualisation_params, team_colors, match_info)
 save_plot(fig, match_info, team_info, visualisation_params)
-
-
-
-
-
-# ## Defensive Actions Plot
-# match_events = preprocess_data(match_events)
-# team_info = extract_team_info(match_events, "defensive_actions")
-# match_info = format_match_info(match_events, team_info)
-# team_colors = get_team_colors(team_info, theme='dark')
-# visualisation_params = setup_visualisation_params(theme='dark')
